@@ -43,28 +43,46 @@ flowFile = session.write(flowFile, {inputStream, outputStream ->
 					}
 				} else {
 					if (cell.getCellType().equals(CellType.NUMERIC)) {
-						if (HSSFDateUtil.isCellDateFormatted(cell)) {
-							record = record + sdf.format(cell.getDateCellValue()) + ','; 
-						} else if (cell.getColumnIndex() == 1) {
-							Double cellValue = cell.getNumericCellValue(); 
-							record = record + cellValue.longValue() + ',';
-						} else {
-							record = record + cell.getNumericCellValue() + ',';
+									
+						switch(cell.getColumnIndex()) {
+							case 2:
+							case 3:
+							case 7:
+							case 8:
+							case 19:
+							case 20:
+								Double cellValue = cell.getNumericCellValue(); 
+								record = record + cellValue.longValue() + ',';
+								//System.out.println(cell.getColumnIndex() + ":" + cell.getCellType() + ":" + cellValue.longValue());
+								break;
+							default:
+								if (HSSFDateUtil.isCellDateFormatted(cell)) {
+									record = record + sdf.format(cell.getDateCellValue()) + ','; 
+								} else {
+									record = record + cell.getNumericCellValue() + ',';
+								}
+								break;
 						}
+						
 					} else if (cell.getCellType().equals(CellType.STRING)) {
+						
 						String strCellValue = cell.getStringCellValue();
+						//System.out.println(cell.getColumnIndex() + ":" + cell.getCellType() + ":" + strCellValue);
+						
 						//remove new lines.
-						strCellValue = strCellValue.replace("\n", " ");
-
-						//Escape commas
+						if (strCellValue.indexOf("\n") != -1) {
+							strCellValue = strCellValue.replace("\n", " "); 
+						}
+						
+						//Escape commas 
 						if (strCellValue.indexOf(",") != -1) {
 							strCellValue = "\"" + strCellValue + "\"";
 						}
-
+						
 						record = record + strCellValue + ',';
-					} else if (cell.getColumnIndex() == 33 && cell.getCellType().equals(CellType.BLANK)) {
-						record = record + cell.getStringCellValue() + ',';
-					}
+						
+						//System.out.println(cell.getStringCellValue() + ":" + cell.getCellType()); 
+					} 
 				}
 			}
 			

@@ -10,18 +10,19 @@ import java.util.Iterator;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-public class MainTest {
+public class MainTestMarathonFile {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		
 		Date date = new Date(); 
 		
-		FileInputStream inputStream = new FileInputStream(new File("/Users/semika/Documents/PFJ_EncinoAutomated_Report_Last100.xlsx"));
+		FileInputStream inputStream = new FileInputStream(new File("/Users/admin/Documents/Ascent_New_File.xlsx"));
 
 			try {
 				Workbook wb = WorkbookFactory.create(inputStream);
@@ -43,11 +44,11 @@ public class MainTest {
 						
 						Cell cell = cellIterator.next();
 						
-						if (cell.getColumnIndex() <= 36) {
+						if (cell.getColumnIndex() <= 25) {
+							
+							//System.out.println(cell.getColumnIndex() + ":" + cell.getCellType());
 							
 							if (rowNum == 1) { //Header row
-								//System.out.println(cell.getCellType()); 
-								//System.out.println(cell.getStringCellValue() + ":" + cell.getCellType());
 								if (!cell.getCellType().equals(CellType.BLANK)) {
 									record = record + cell.getStringCellValue() + ',';
 								}
@@ -55,15 +56,27 @@ public class MainTest {
 								
 								if (cell.getCellType().equals(CellType.NUMERIC)) {
 									
-									if (HSSFDateUtil.isCellDateFormatted(cell)) {
-										record = record + sdf.format(cell.getDateCellValue()) + ','; 
-									} else if (cell.getColumnIndex() == 1) {
-										Double cellValue = cell.getNumericCellValue(); 
-										record = record + cellValue.longValue() + ',';
-										//System.out.println(cell.getColumnIndex() + ":" + cell.getCellType() + ":" + cellValue.longValue());
-									} else {
-										record = record + cell.getNumericCellValue() + ',';
+									switch(cell.getColumnIndex()) {
+										case 2:
+										case 3:
+										case 7:
+										case 8:
+										case 19:
+										case 20:
+											Double cellValue = cell.getNumericCellValue(); 
+											record = record + cellValue.longValue() + ',';
+											//System.out.println(cell.getColumnIndex() + ":" + cell.getCellType() + ":" + cellValue.longValue());
+											break;
+										default:
+											if (HSSFDateUtil.isCellDateFormatted(cell)) {
+												record = record + sdf.format(cell.getDateCellValue()) + ','; 
+											} else {
+												record = record + cell.getNumericCellValue() + ',';
+											}
+											break;
+									
 									}
+									
 									
 								} else if (cell.getCellType().equals(CellType.STRING)) {
 									
@@ -83,10 +96,7 @@ public class MainTest {
 									record = record + strCellValue + ',';
 									
 									//System.out.println(cell.getStringCellValue() + ":" + cell.getCellType()); 
-								} else if (cell.getColumnIndex() == 33 && cell.getCellType().equals(CellType.BLANK)) {
-									//System.out.println(cell.getStringCellValue().length()); 
-									record = record + cell.getStringCellValue() + ',';
-								}
+								} 
 							}
 						}
 					} 
@@ -96,15 +106,7 @@ public class MainTest {
 					if (record.trim().length() > 0) {
 						record = record.substring(0, record.lastIndexOf(","))  + '\n'; 
 					}
-
-					//if(rowNum > 1) {
-						// insert tstamp, row num, drop last comma and add end line.
-						// Note: tstamp + row num are composite key
-						//record = tstamp + ',' + rowNum + ',' + record[0..-2] + '\n'
-						//outputStream.write(record.getBytes(StandardCharsets.UTF_8))
-						
-						System.out.println(record); 
-					//}
+					System.out.println(record); 
 					record = "";
 					//break;
 				}
@@ -112,14 +114,7 @@ public class MainTest {
 			}
 			catch(Exception e) {
 				e.printStackTrace(); 
-				//log.error("Error during processing of spreadsheet name = xx, sheet = xx", e);
-				//session.transfer(inputStream, REL_FAILURE)
 			}
-		//} as StreamCallback)
-
-		//def filename = flowFile.getAttribute('filename').split('\\.')[0] + '_' + new SimpleDateFormat("YYYYMMdd-HHmmss").format(date)+'.csv'
-		//flowFile = session.putAttribute(flowFile, 'filename', filename)
-		//session.transfer(flowFile, REL_SUCCESS)
     }
 
 }
