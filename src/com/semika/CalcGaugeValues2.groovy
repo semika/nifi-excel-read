@@ -51,15 +51,12 @@ try {
 		}
 		//copy past end
 		
-		session.transfer(flowFile, REL_SUCCESS)
-		
 		flowFile = session.putAttribute(flowFile, "Feet(gauge-2)", feet + "")
 		flowFile = session.putAttribute(flowFile, "Inch(gauge-2)", inches + "")
 		flowFile = session.putAttribute(flowFile, "Frac Inch(gauge-2)", quarteInchValue + "")
-	} else {
-		//send the flow file to failure relationship. 
-		session.transfer(flowFile, REL_FAILURE)
 	}
+	
+	session.transfer(flowFile, REL_SUCCESS)
 	
 } catch (Exception e) {
 	log.error("Error when finding gauge values", e)
